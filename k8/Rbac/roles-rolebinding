@@ -1,12 +1,12 @@
 .
 
 🛠 Process to Add User saiteja in EKS and Bind Roles
-```
+
 1. Create IAM User in AWS Console
 
 --- >> Go to AWS Console → IAM → Users → Add User.
 
-     Name: saiteja.
+     creating user ->Name: saiteja.
 
     Access type: enable Programmatic access (so he can use aws configure).
 
@@ -17,4 +17,23 @@ Save Access Key + Secret Key for saiteja.
 
 ````
 
-2. **Map User to Kubernetes (aws-auth ConfigMap)**
+2. Map User to Kubernetes (aws-auth ConfigMap)
+
+  By default, IAM users dont directly get kuberenetes permissions.You need to add them to aws-auth ConfigMap in the cluster.
+
+      1. Edit the aws-auth ConfigMap:
+
+               command--> kubectl edit configmap aws-auth -n kube-system
+      2. Add the user-Saiteja 
+            
+                    mapUsers: |
+                        - userarn: arn:aws:iam::<ACCOUNT_ID>:user/saiteja
+                          username: saiteja
+                          groups:
+                            - saiteja-group
+            ⚠️ Replace <ACCOUNT_ID> with your AWS Account ID.
+
+**The step “map IAM user to Kubernetes RBAC” using the aws-auth ConfigMap is the bridge between AWS IAM and Kubernetes RBAC.**
+
+
+

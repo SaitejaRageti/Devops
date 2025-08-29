@@ -1,0 +1,46 @@
+1️⃣ Pod Affinity
+
+What it is: A rule that tells Kubernetes, “I want my pod to be scheduled on the same node (or close to) as other pods with certain labels.”
+Purpose: Co-locate pods that work together, e.g., a frontend pod near its backend pod to reduce network latency.
+
+How it works: Scheduler looks for nodes that already have pods with the specified labels and tries to place the pod there.
+
+Example conceptually:
+“Pod A wants to be on the same node as any pod with label app=backend.”
+
+Use cases:
+Reduce network latency between cooperating pods.
+Cache pods near the services they frequently access.
+
+2️⃣ Pod Anti-Affinity
+
+What it is: A rule that tells Kubernetes, “I do NOT want my pod to be scheduled on the same node (or topology) as other pods with certain labels.”
+Purpose: Spread pods across nodes for high availability and fault tolerance.
+
+How it works: Scheduler avoids nodes that already have pods with the specified labels.
+
+Example conceptually:
+“Pod B must not be scheduled on the same node as any pod with label app=frontend.”
+
+Use cases:
+Database or cache replicas → avoid single-node failures.
+Critical workloads → prevent them from being colocated with noisy or test pods.
+
+3️⃣ Key Notes
+Pod Affinity = stick together
+Pod Anti-Affinity = stay apart
+
+Hard vs Soft rules:
+Hard → must follow (if impossible → pod stays pending)
+Soft → prefer but can ignore if necessary
+
+Topology key: defines the “unit” for spreading, e.g., node, zone, region.
+kubernetes.io/hostname → per node
+
+failure-domain.beta.kubernetes.io/zone → per zone
+
+✅ Summary in one line:
+
+Affinity = I want to be with certain pods.
+
+Anti-Affinity = I want to avoid certain pods.

@@ -1,0 +1,99 @@
+install helm?
+
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+helm version
+
+This downloads the latest Helm v3 version and installs it.
+
+--------------------------------------------------------------------------------------
+
+HELM? 
+
+Helm is a package manager for Kubernetes, similar to how apt works for Ubuntu or yum for CentOS.
+
+Instead of writing huge YAML files, Helm lets you package them into charts (reusable templates).
+
+You can install, upgrade, and manage Kubernetes applications easily using these charts.
+
+---------------------------------------------------------
+
+🔹 Why do we use Helm?
+
+**Simplifies Kubernetes deployment**s
+
+One helm install can deploy dozens of YAMLs (Deployments, Services, Ingress, ConfigMaps, etc.).
+
+**Reusable & shareable charts**
+
+Community charts exist for popular tools (NGINX, Prometheus, Grafana, ArgoCD, etc.).
+
+You don’t need to reinvent the wheel — just customize values.
+
+**Configuration via values.yaml**
+
+Instead of editing manifests directly, you just override settings in a simple values file.
+
+**Versioned & Rollbacks**
+
+Helm tracks versions of releases.
+
+If something breaks, you can roll back with one command.
+
+**Easier upgrades**
+
+Upgrading an app is as simple as helm upgrade with new values.
+
+-----------------------------------------------------------
+
+🔹 Advantages of Helm
+
+✅ Speeds up deployment (no need to write 100s of lines of YAML).
+✅ Makes apps portable and reproducible across environments.
+✅ Supports templating & parameterization.
+✅ Huge ecosystem of official and community charts.
+✅ Rollbacks built-in.
+
+---------------------------------------------------------------
+
+helm upgrade --install <name> . --> expects Chart.yaml in current directory
+helm status <name>
+helm rollback <name> --> 1 revision back
+helm uninstall <name>
+
+helm repo add <URL>
+helm update
+helm install name <location
+
+
+helm install nginx . --> . represents current directory
+helm upgrade nginx . --> updates to latest version
+helm list --> list all helm apps running
+
+helm status nginx 
+
+
+--------------------------------------
+
+mychart/
+├── Chart.yaml         # Chart metadata (name, version, description)
+├── values.yaml        # Default configuration values
+├── templates/         # Kubernetes manifests with templating
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   └── _helpers.tpl  # reusable template helpers
+└── .helmignore        # files/folders to ignore when packaging
+
+------------------------------------------------
+
+Quick explanation:
+
+Chart.yaml → Metadata about the chart.
+
+values.yaml → Default configuration that templates use.
+
+templates/ → Contains all your Kubernetes YAML templates.
+
+.helmignore → Ignore unnecessary files when packaging the chart.
+

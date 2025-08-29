@@ -1,0 +1,98 @@
+What is Node Affinity?
+
+Node Affinity is a scheduling constraint that tells Kubernetes which nodes a pod can or prefers to run on, based on node labels.
+
+It’s part of the affinity section in a Pod spec.
+
+More flexible and expressive than nodeSelector.
+
+Node labels are key-value pairs applied to nodes:
+
+command :: kubectl label node <node-name> disktype=ssd
+
+Syntax: 
+
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In
+            values:
+            - ssd
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: region
+            operator: In
+            values:
+            - us-east-1
+
+Key Types
+
+requiredDuringSchedulingIgnoredDuringExecution
+
+      Hard rule: pod will not schedule unless node matches.
+      If no node satisfies it → pod stays in Pending.
+
+preferredDuringSchedulingIgnoredDuringExecution
+
+      Soft rule: pod prefers nodes with the label, but can run elsewhere.
+      Weight can be 1–100 → higher weight = stronger preference.
+
+
+# Ensures pods run on nodes with specific hardware or characteristics:
+
+SSD vs HDD (disktype=ssd)
+GPU nodes (gpu=true)
+Region/zone (zone=us-east-1)
+Useful for performance, cost optimization, compliance
+
+# 3️⃣ When to use Node Affinity
+
+When certain apps require specific node features.
+
+When nodeSelector is too rigid → Node Affinity supports operators like:
+
+          In, NotIn, Exists, DoesNotExist, Gt, Lt.
+
+Example: AI workloads on GPU nodes, database pods on high-memory nodes.
+
+
+# What is Node Anti-Affinity?
+
+Node Anti-Affinity is the opposite:
+It tells Kubernetes where a pod should NOT run based on node labels.
+
+Useful for spreading pods across nodes or avoiding certain nodes.
+
+Part of the same affinity section.
+
+Example: Anti-Affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: NotIn
+            values:
+            - hdd
+
+
+This pod will avoid nodes labeled disktype=hdd.
+
+Use Case of Anti-Affinity
+Avoid putting multiple replicas on the same node → high availability
+Avoid noisy nodes → ensure critical pods don’t share nodes with test workloads
+Prevent scheduling on nodes under maintenance
+
+
+
+
+
+

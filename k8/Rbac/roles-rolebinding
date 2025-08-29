@@ -1,6 +1,32 @@
-.
+**What is RBAC in Kubernetes?**
 
-🛠 Process to Add User saiteja in EKS and Bind Roles
+RBAC (Role-Based Access Control) is a way to control who can do what in your Kubernetes cluster.
+It uses the following objects:
+
+Role – Defines a set of permissions within a namespace (e.g., can list pods in dev namespace).
+
+RoleBinding – Grants a user/service account/group the permissions defined in a Role (in a namespace).
+
+ClusterRole – Like Role, but applies cluster-wide (all namespaces).
+
+ClusterRoleBinding – Grants a user/service account/group a ClusterRole (cluster-wide).
+
+
+**🏗 How it Works in EKS (AWS)**
+
+In Amazon EKS, authentication is handled through AWS IAM and the aws-auth ConfigMap.
+
+IAM users/roles get mapped to Kubernetes users/groups.
+
+RBAC then decides what they can do.
+
+So, the flow is:
+IAM User/Role → aws-auth ConfigMap → Kubernetes RBAC (Role/ClusterRole + Binding)
+
+
+
+
+**🛠 Process to Add User saiteja in EKS and Bind Roles**
 
 1. Create IAM User in AWS Console
 
@@ -31,7 +57,10 @@ Save Access Key + Secret Key for saiteja.
                           username: saiteja
                           groups:
                             - saiteja-group
-            ⚠️ Replace <ACCOUNT_ID> with your AWS Account ID.
+                    
+                    if group not required --exclude the group
+
+                    ⚠️ Replace <ACCOUNT_ID> with your AWS Account ID.
 
       3. kubectl apply -f aws-auth.yaml
 
@@ -45,7 +74,7 @@ Save Access Key + Secret Key for saiteja.
 👉 aws-auth = glue that connects IAM identity to Kubernetes user/group -->
 
 
-# 1. Namespace Role (read-only pods in dev namespace)
+**# 1. Namespace Role (read-only pods in dev namespace)**
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

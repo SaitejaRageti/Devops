@@ -33,7 +33,69 @@ Save Access Key + Secret Key for saiteja.
                             - saiteja-group
             ⚠️ Replace <ACCOUNT_ID> with your AWS Account ID.
 
+      3. kubectl apply -f aws-auth.yaml
+
+
 **The step “map IAM user to Kubernetes RBAC” using the aws-auth ConfigMap is the bridge between AWS IAM and Kubernetes RBAC.**
 
 
+<!-- So:
+👉 IAM = who are you?
+👉 RBAC = what can you do?
+👉 aws-auth = glue that connects IAM identity to Kubernetes user/group -->
+
+
+# 1. Namespace Role (read-only pods in dev namespace)
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: dev-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+# 2. RoleBinding for saiteja (namespace-level)
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-pod-reader-binding
+  namespace: dev
+subjects:
+- kind: Group
+  name: saiteja-group   # group defined in aws-auth
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: dev-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# 3. ClusterRole (cluster-wide read-only for pods, nodes, services)
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-readonly
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes", "services"]
+  verbs: ["get", "list", "watch"]
+---
+
+# 4. ClusterRoleBinding for saiteja (cluster-level)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-readonly-binding
+subjects:
+- kind: Group
+  name: saiteja-group   # group defined in aws-auth
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-readonly
+  apiGroup: rbac.authorization.k8s.io
 
